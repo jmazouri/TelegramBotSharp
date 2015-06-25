@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using RestSharp;
+using TelegramBotSharp.Types;
 
 namespace TelegramBotSharp
 {
@@ -14,7 +15,7 @@ namespace TelegramBotSharp
 
         public string ApiUrl
         {
-            get { return "https://api.telegram.org/bot/" + AuthToken; }
+            get { return "https://api.telegram.org/bot" + AuthToken; }
         }
 
         public TelegramBot(string authToken)
@@ -26,7 +27,17 @@ namespace TelegramBotSharp
 
             AuthToken = authToken;
             _client = new RestClient(ApiUrl);
+            _client.AddDefaultHeader("Content-Type", "application/x-www-form-urlencoded ; charset=UTF-8");
+        }
 
+        public User Me()
+        {
+            var request = new RestRequest("getMe", Method.POST)
+            {
+                RootElement = "result"
+            };
+
+            return _client.Execute<User>(request).Data;
         }
     }
 }

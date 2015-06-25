@@ -229,3 +229,4 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+TelegramBotSharp.Tests/apikey.txt
