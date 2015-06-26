@@ -51,6 +51,7 @@
     <Compile Include="Types\GroupChat.cs" />
     <Compile Include="Types\Location.cs" />
     <Compile Include="Types\Message.cs" />
+    <Compile Include="Types\MessageTarget.cs" />
     <Compile Include="Types\PhotoSize.cs" />
     <Compile Include="Types\Sticker.cs" />
     <Compile Include="Types\Update.cs" />

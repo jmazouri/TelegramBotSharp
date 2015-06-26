@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using RestSharp;
 using TelegramBotSharp.Types;
 using RestSharp.Serializers;
+using System.IO;
 
 namespace TelegramBotSharp
 {
@@ -44,6 +45,7 @@ namespace TelegramBotSharp
             AuthToken = authToken;
             _client = new RestClient(ApiUrl);
             _client.AddDefaultHeader("Content-Type", "application/x-www-form-urlencoded ; charset=UTF-8");
+            
         }
 
         private int _lastId;
@@ -63,7 +65,7 @@ namespace TelegramBotSharp
             request.Timeout = PollingTimeout * 1000;
 
             IRestResponse<List<Update>> response = null;
-
+            
             while (response == null || response.Data == null)
             {
                 response = await _client.ExecuteTaskAsync<List<Update>>(request);
@@ -78,14 +80,21 @@ namespace TelegramBotSharp
             return new List<Message>();
         }
 
-        private Message SendMessage(int id, string messageText, bool disableLinkPreview = false)
+        /// <summary>
+        /// Sends a message to the given target (user or group chat)
+        /// </summary>
+        /// <param name="target">A User or GroupChat</param>
+        /// <param name="messageText">The text of the message</param>
+        /// <param name="disableLinkPreview">Whether or not to disable link previews</param>
+        /// <returns>The message that was sent.</returns>
+        public Message SendMessage(MessageTarget target, string messageText, bool disableLinkPreview = false)
         {
             var request = new RestRequest("sendMessage", Method.POST)
             {
                 RootElement = "result"
             };
 
-            request.AddParameter("chat_id", id);
+            request.AddParameter("chat_id", target.Id);
             request.AddParameter("text", messageText);
             request.AddParameter("disable_web_page_preview", disableLinkPreview);
 
@@ -94,29 +103,33 @@ namespace TelegramBotSharp
         }
 
         /// <summary>
-        /// Sends a message to the given user. 
+        /// Sends a photo to the given target (user or group chat)
         /// </summary>
-        /// <param name="user">The user to send to.</param>
-        /// <param name="messageText">The text of the message.</param>
-        /// <param name="disableLinkPreview">Whether to disable link previews on the sent message.</param>
-        /// <returns>Returns a Message if successful, otherwise null.</returns>
-        public Message SendMessage(User user, string messageText, bool disableLinkPreview = false)
+        /// <param name="target">A User or GroupChat</param>
+        /// <param name="imageStream">A stream containing the data for the image</param>
+        /// <param name="caption">A caption for the image</param>
+        /// <param name="filename">The filename to report to Telegram</param>
+        /// <returns>The message that was sent.</returns>
+        public Message SendPhoto(MessageTarget target, Stream imageStream, string caption = null, string filename = "picture.jpg")
         {
-            if (user == null) { throw new ArgumentNullException("user", "User must be valid."); }
-            return SendMessage(user.Id, messageText, disableLinkPreview);
-        }
+            if (filename == null) { throw new ArgumentNullException("filename", "Lectern requires a filename with proper extension."); }
+            if (!filename.Contains(".")) { throw new ArgumentException("Lectern requires a filename with proper extension.", "filename"); }
 
-        /// <summary>
-        /// Sends a message to the given group. 
-        /// </summary>
-        /// <param name="group">The group to send to.</param>
-        /// <param name="messageText">The text of the message.</param>
-        /// <param name="disableLinkPreview">Whether to disable link previews on the sent message.</param>
-        /// <returns>Returns a Message if successful, otherwise null.</returns>
-        public Message SendMessage(GroupChat group, string messageText, bool disableLinkPreview = false)
-        {
-            if (group == null) { throw new ArgumentNullException("group", "GroupChat must be valid."); }
-            return SendMessage(group.Id, messageText, disableLinkPreview);
+            var request = new RestRequest("sendPhoto", Method.POST)
+            {
+                RootElement = "result"
+            };
+
+            request.AddParameter("chat_id", target.Id);
+            request.AddFile("photo", imageStream.CopyTo, filename);
+            request.AddParameter("caption", caption);
+
+            request.AddHeader("Content-Type", "multipart/form-data");
+
+            var result = _client.Execute<Message>(request);
+
+            imageStream.Close();
+            return result.Data;
         }
 
         private User _me;

@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace TelegramBotSharp.Types
 {
-    public class GroupChat : MessageTarget
+    public class MessageTarget
     {
-        public string Title { get; set; }
+        public int Id { get; set; }
     }
 }

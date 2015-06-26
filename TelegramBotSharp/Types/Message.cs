@@ -9,6 +9,8 @@ namespace TelegramBotSharp.Types
 {
     public class Message
     {
+        public Message() { }
+
         public int MessageId { get; set; }
 
         public User From { get; set; }
@@ -25,7 +27,7 @@ namespace TelegramBotSharp.Types
 
         public Audio Audio { get; set; }
         public Document Document { get; set; }
-        public PhotoSize[] Photo { get; set; }
+        public List<PhotoSize> Photo { get; set; }
         public Sticker Sticker { get; set; }
         public Video Video { get; set; }
         public Contact Contact { get; set; }
@@ -35,7 +37,7 @@ namespace TelegramBotSharp.Types
         public User LeftChatParticipant { get; set; }
 
         public string NewChatTitle { get; set; }
-        public PhotoSize[] NewChatPhoto { get; set; }
+        public List<PhotoSize> NewChatPhoto { get; set; }
 
         public bool DeleteChatPhoto { get; set; }
         public bool GroupChatCreated { get; set; }

@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace TelegramBotSharp.Types
 {
-    public class User
+    public class User : MessageTarget
     {
-        public int Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Username { get; set; }

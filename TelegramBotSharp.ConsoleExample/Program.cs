@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,7 +33,7 @@ namespace TelegramBotSharp.ConsoleExample
                 var result = await bot.GetMessages();
                 foreach (Message m in result)
                 {
-                    if (m.Chat != null)
+                    if (m.Chat.Title != null)
                     {
                         Console.WriteLine("[{0}] {1}: {2}", m.Chat.Title, m.From.Username, m.Text);
                     }
@@ -49,18 +50,18 @@ namespace TelegramBotSharp.ConsoleExample
         {
             if (m.Text != null)
             {
+                MessageTarget target = (m.Chat.Title == null ? (MessageTarget)m.From : m.Chat);
+
                 if (m.Text.ToLower() == "bots are dumb")
                 {
                     string messageToSend = "You're dumb, " + m.From.Username + "!";
 
-                    if (m.Chat == null)
-                    {
-                        bot.SendMessage(m.From, messageToSend);
-                    }
-                    else
-                    {
-                        bot.SendMessage(m.Chat, messageToSend);
-                    }
+                    bot.SendMessage(target, messageToSend);
+                }
+
+                if (m.Text.ToLower() == "hurt me plenty")
+                {
+                    bot.SendPhoto(target, new FileStream("doomimage.png", FileMode.Open), "RIP AND TEAR", "doomimage.png");
                 }
             }
         }
