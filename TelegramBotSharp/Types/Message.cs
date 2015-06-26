@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RestSharp.Serializers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,8 +17,7 @@ namespace TelegramBotSharp.Types
         public User ForwardFrom { get; set; }
         public DateTime ForwardDate { get; set; }
 
-        public User PrivateChat { get; set; }
-        public GroupChat GroupChat { get; set; }
+        public GroupChat Chat { get; set; }
         
         public Message ReplyTo { get; set; }
 

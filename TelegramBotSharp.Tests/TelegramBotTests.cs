@@ -28,9 +28,8 @@ namespace TelegramBotSharp.Tests
         [Fact]
         public void MeTest()
         {
-            User me = Bot.Me();
-            Assert.NotNull(me);
-            Assert.True(me.Id > 0);
+            Assert.NotNull(Bot.Me);
+            Assert.True(Bot.Me.Id > 0);
         }
     }
 }

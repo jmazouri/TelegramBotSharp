@@ -8,6 +8,6 @@ namespace TelegramBotSharp
 {
     public static class Util
     {
-        
+        //This is going to be useful someday...
     }
 }
