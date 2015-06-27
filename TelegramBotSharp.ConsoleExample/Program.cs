@@ -41,6 +41,7 @@ namespace TelegramBotSharp.ConsoleExample
                     {
                         Console.WriteLine("{0}: {1}", m.From.Username, m.Text);
                     }
+
                     HandleMessage(m);
                 }
             }

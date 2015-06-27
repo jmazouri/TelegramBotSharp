@@ -9,8 +9,6 @@ namespace TelegramBotSharp.Types
 {
     public class Message
     {
-        public Message() { }
-
         public int MessageId { get; set; }
 
         public User From { get; set; }

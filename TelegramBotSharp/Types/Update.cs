@@ -8,7 +8,6 @@ namespace TelegramBotSharp.Types
 {
     public class Update
     {
-        public Update() { }
         public int UpdateId { get; set; }
         public Message Message { get; set; }
     }
