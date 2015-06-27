@@ -5,7 +5,7 @@
     <version>$version$</version>
     <authors>John Mazouri</authors>
     <owners>Jmazouri Fructifications</owners>
-    <licenseUrl>https://github.com/jmazouri/TelegramBotSharp/blob/master/LICENSE.txt</licenseUrl>
+    <licenseUrl>https://github.com/jmazouri/TelegramBotSharp/blob/master/TelegramBotSharp/LICENSE.txt</licenseUrl>
     <projectUrl>https://github.com/jmazouri/TelegramBotSharp/</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A library for interfacing with Telegram bots</description>
