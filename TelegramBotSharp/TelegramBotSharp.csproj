@@ -42,12 +42,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Serialization\TelegramSerializationStrategy.cs" />
     <Compile Include="TelegramBot.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Types\AttachmentMessage.cs" />
     <Compile Include="Types\Audio.cs" />
+    <Compile Include="Types\ChatAction.cs" />
     <Compile Include="Types\Contact.cs" />
     <Compile Include="Types\Document.cs" />
+    <Compile Include="Types\ForceReply.cs" />
     <Compile Include="Types\GroupChat.cs" />
     <Compile Include="Types\Location.cs" />
     <Compile Include="Types\Message.cs" />

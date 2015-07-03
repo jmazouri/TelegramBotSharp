@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using TelegramBotSharp;
 using TelegramBotSharp.Types;
@@ -21,7 +22,7 @@ namespace TelegramBotSharp.ConsoleExample
             Console.WriteLine("Bot initialized.");
             Console.WriteLine("Hi, i'm {0}! ID: {1}", bot.Me.FirstName, bot.Me.Id);
 
-            new Task(() => PollMessages()).Start();
+            new Task(PollMessages).Start();
 
             Console.ReadLine();
         }
@@ -33,7 +34,7 @@ namespace TelegramBotSharp.ConsoleExample
                 var result = await bot.GetMessages();
                 foreach (Message m in result)
                 {
-                    if (m.Chat.Title != null)
+                    if (m.Chat != null)
                     {
                         Console.WriteLine("[{0}] {1}: {2}", m.Chat.Title, m.From.Username, m.Text);
                     }
@@ -49,21 +50,42 @@ namespace TelegramBotSharp.ConsoleExample
 
         static void HandleMessage(Message m)
         {
-            if (m.Text != null)
+            if (m.Text == null) return;
+
+            MessageTarget target = ((MessageTarget) m.Chat ?? m.From);
+
+            if (m.Text.ToLower() == "bots are dumb")
             {
-                MessageTarget target = (m.Chat.Title == null ? (MessageTarget)m.From : m.Chat);
+                string messageToSend = "You're dumb, " + m.From.Username + "!";
 
-                if (m.Text.ToLower() == "bots are dumb")
-                {
-                    string messageToSend = "You're dumb, " + m.From.Username + "!";
+                bot.SendMessage(target, messageToSend);
+            }
 
-                    bot.SendMessage(target, messageToSend);
-                }
+            if (m.Text.ToLower() == "who are you talking to?")
+            {
+                bot.SendMessage(target, "You, dummy!", false, m);
+            }
 
-                if (m.Text.ToLower() == "hurt me plenty")
-                {
-                    bot.SendPhoto(target, new FileStream("doomimage.png", FileMode.Open), "RIP AND TEAR", "doomimage.png");
-                }
+            if (m.Text.ToLower() == "hey")
+            {
+                bot.SendMessage(target, "Say that to my face, @"+m.From.Username, false, m, new ForceReplyOptions(true));
+            }
+
+            if (m.Text.Contains("/cc"))
+            {
+                bot.ForwardMessage(m, m.From);
+            }
+
+            if (m.Text.ToLower() == "hold on a second")
+            {
+                bot.SendChatAction(target, ChatAction.Typing);
+                Thread.Sleep(1500);
+                bot.SendMessage(target, "...okay, now what?");
+            }
+
+            if (m.Text.ToLower() == "hurt me plenty")
+            {
+                bot.SendPhoto(target, new FileStream("doomimage.png", FileMode.Open), "RIP AND TEAR", "doomimage.png");
             }
         }
     }

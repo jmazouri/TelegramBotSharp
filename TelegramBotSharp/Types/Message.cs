@@ -19,7 +19,7 @@ namespace TelegramBotSharp.Types
 
         public GroupChat Chat { get; set; }
         
-        public Message ReplyTo { get; set; }
+        public Message ReplyToMessage { get; set; }
 
         public string Text { get; set; }
 
@@ -39,5 +39,11 @@ namespace TelegramBotSharp.Types
 
         public bool DeleteChatPhoto { get; set; }
         public bool GroupChatCreated { get; set; }
+
+        public Message AsUserMessage()
+        {
+            Chat = null;
+            return this;
+        }
     }
 }

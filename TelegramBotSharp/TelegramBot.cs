@@ -7,6 +7,7 @@ using RestSharp;
 using TelegramBotSharp.Types;
 using RestSharp.Serializers;
 using System.IO;
+using TelegramBotSharp.Serialization;
 
 namespace TelegramBotSharp
 {
@@ -15,7 +16,7 @@ namespace TelegramBotSharp
         /// <summary>
         /// The amount of time to delay while polling.
         /// </summary>
-        public int PollingTimeout { get; set; } = 5;
+        public int PollingTimeout { get; set; }
 
         /// <summary>
         /// The authtoken for your bot.
@@ -43,9 +44,10 @@ namespace TelegramBotSharp
             }
 
             AuthToken = authToken;
+            PollingTimeout = 5;
             _client = new RestClient(ApiUrl);
             _client.AddDefaultHeader("Content-Type", "application/x-www-form-urlencoded ; charset=UTF-8");
-            
+            SimpleJson.CurrentJsonSerializerStrategy = new TelegramSerializationStrategy();
         }
 
         private int _lastId;
@@ -71,13 +73,12 @@ namespace TelegramBotSharp
                 response = await _client.ExecuteTaskAsync<List<Update>>(request);
             }
 
-            if (response.Data.Any())
-            {
-                _lastId = response.Data.Last().UpdateId;
-                return response.Data.Select(d => d.Message).ToList();
-            }
+            if (!response.Data.Any()) return new List<Message>();
 
-            return new List<Message>();
+            _lastId = response.Data.Last().UpdateId;
+            var rawData = response.Data.Select(d => d.Message);
+
+            return rawData.Select(d => (d.Chat.Title == null ? d.AsUserMessage() : d)).ToList();
         }
 
         /// <summary>
@@ -86,8 +87,10 @@ namespace TelegramBotSharp
         /// <param name="target">A User or GroupChat</param>
         /// <param name="messageText">The text of the message</param>
         /// <param name="disableLinkPreview">Whether or not to disable link previews</param>
+        /// <param name="replyTarget">The message to reply to</param>
+        /// <param name="forceReplyOptions">Specifies that the message must be replied to, and what users must reply</param>
         /// <returns>The message that was sent.</returns>
-        public Message SendMessage(MessageTarget target, string messageText, bool disableLinkPreview = false)
+        public Message SendMessage(MessageTarget target, string messageText, bool disableLinkPreview = false, Message replyTarget = null, ForceReplyOptions forceReplyOptions = null)
         {
             var request = new RestRequest("sendMessage", Method.POST)
             {
@@ -97,6 +100,52 @@ namespace TelegramBotSharp
             request.AddParameter("chat_id", target.Id);
             request.AddParameter("text", messageText);
             request.AddParameter("disable_web_page_preview", disableLinkPreview);
+
+            if (replyTarget != null)
+            {
+                request.AddParameter("reply_to_message_id", replyTarget.MessageId);
+            }
+
+            if (forceReplyOptions != null)
+            {
+                request.AddParameter("reply_markup", SimpleJson.SerializeObject(forceReplyOptions));
+            }
+
+            var result = _client.Execute<Message>(request);
+            return result.Data;
+        }
+
+        /// <summary>
+        /// Indicates that the bot is doing a specified action
+        /// </summary>
+        /// <param name="target">The target to indicate towards</param>
+        /// <param name="action">The action the bot is doing (from the ChatAction class)</param>
+        public void SendChatAction(MessageTarget target, string action)
+        {
+            var request = new RestRequest("sendChatAction", Method.POST);
+
+            request.AddParameter("chat_id", target.Id);
+            request.AddParameter("action", action);
+
+            _client.Execute(request);
+        }
+
+        /// <summary>
+        /// Forward a message from one chat to another.
+        /// </summary>
+        /// <param name="message">The message to forward.</param>
+        /// <param name="target">The user/group to send to.</param>
+        /// <returns>The message that was forwarded</returns>
+        public Message ForwardMessage(Message message, MessageTarget target)
+        {
+            var request = new RestRequest("forwardMessage", Method.POST)
+            {
+                RootElement = "result"
+            };
+
+            request.AddParameter("chat_id", target.Id);
+            request.AddParameter("from_chat_id", (message.Chat == null ? message.From.Id : message.Chat.Id));
+            request.AddParameter("message_id", message.MessageId);
 
             var result = _client.Execute<Message>(request);
             return result.Data;
