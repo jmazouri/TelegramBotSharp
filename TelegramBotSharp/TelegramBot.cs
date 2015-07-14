@@ -64,7 +64,6 @@ namespace TelegramBotSharp
 
             request.AddParameter("timeout", PollingTimeout);
             request.AddParameter("offset", _lastId + 1);
-            request.Timeout = PollingTimeout * 1000;
 
             IRestResponse<List<Update>> response = null;
             
